@@ -89,12 +89,12 @@ public extension PlainNavbar {
     }
 }
 @available(iOS 15.0, *)
-struct PlainNavbar: View {
+public struct PlainNavbar: View {
 
     @ObservedObject var viewModel: ViewModel
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     
-    var body: some View {
+    public var body: some View {
         
         switch viewModel.state {
             
