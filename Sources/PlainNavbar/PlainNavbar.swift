@@ -2,10 +2,10 @@ import SwiftUI
 import Foundation
 
 @available(iOS 15.0, *)
-extension PlainNavbar {
+public extension PlainNavbar {
     
     @available(iOS 15.0, *)
-    class ViewModel: ObservableObject {
+    public class ViewModel: ObservableObject {
         
         @Published var title: Title
         @Published var leftButtons: [BaseButtonViewModel]
@@ -28,23 +28,23 @@ extension PlainNavbar {
             self.state = state
         }
         
-        enum State {
+        public enum State {
             case normal
             case hidden
         }
         
-        enum Title {
+        public enum Title {
             
             case text(String)
             case empty
         }
         
-        class BaseButtonViewModel: ObservableObject ,Identifiable {
+        public class BaseButtonViewModel: ObservableObject ,Identifiable {
             
             let id: UUID = UUID()
         }
         
-        class CloseButtonViewModel: BaseButtonViewModel {
+        public class CloseButtonViewModel: BaseButtonViewModel {
             
             @Published var icon: Image = Image(systemName: "xmark")
             @Published var action: () -> Void
@@ -55,7 +55,7 @@ extension PlainNavbar {
             }
         }
         
-        class TextButtonViewModel: BaseButtonViewModel {
+        public class TextButtonViewModel: BaseButtonViewModel {
             
             @Published var text: String
             @Published var action: () -> Void
@@ -67,14 +67,14 @@ extension PlainNavbar {
             }
         }
         
-        class LargeTitleLabel: BaseButtonViewModel {
+        public class LargeTitleLabel: BaseButtonViewModel {
             @Published var text: String
             init(text: String) {
                 self.text = text
             }
         }
         
-        class BackButtonViewModel: BaseButtonViewModel {
+        public class BackButtonViewModel: BaseButtonViewModel {
             
             @Published var text: String
             @Published var action: () -> Void
@@ -89,20 +89,10 @@ extension PlainNavbar {
     }
 }
 @available(iOS 15.0, *)
-struct PlainNavbar: View {
+public struct PlainNavbar: View {
 
     @ObservedObject var viewModel: ViewModel
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-    
-    var leftPlaceholdersCount: Int {
-        
-        return max(viewModel.rightButtons.count - viewModel.leftButtons.count, 0)
-    }
-    
-    var rightPlaceholdersCount: Int {
-        
-        return max(viewModel.leftButtons.count - viewModel.rightButtons.count, 0)
-    }
     
     var body: some View {
         
@@ -146,7 +136,6 @@ struct PlainNavbar: View {
                     Text(title)
                         .foregroundColor(viewModel.textColor)
                         .font(.callout)
-
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .center)
                     
@@ -257,19 +246,19 @@ public extension View {
 }
 
 @available(iOS 15.0, *)
-extension PlainNavbar.ViewModel {
+public extension PlainNavbar.ViewModel {
     
     
-    static let sample = PlainNavbar.ViewModel(title: .text("Main"),
+    public static let sample = PlainNavbar.ViewModel(title: .text("Main"),
                                                      leftButtons: [PlainNavbar.ViewModel.LargeTitleLabel(text: "hello")],
                                                      rightButtons: [PlainNavbar.ViewModel.CloseButtonViewModel(action: {}),
                                                                     PlainNavbar.ViewModel.TextButtonViewModel(text: "Forgot?", action: {})], textColor: .black)
     
-    static let onlyBackButton = PlainNavbar.ViewModel(title: .empty,
+    public static let onlyBackButton = PlainNavbar.ViewModel(title: .empty,
                                                      leftButtons: [PlainNavbar.ViewModel.BackButtonViewModel(action: {})],
                                                       textColor: .black)
     
-    static let onlyCloseButton = PlainNavbar.ViewModel(title: .empty,
+    public static let onlyCloseButton = PlainNavbar.ViewModel(title: .empty,
                                                        rightButtons: [PlainNavbar.ViewModel.CloseButtonViewModel(action: {})],
                                                       textColor: .black)
 
