@@ -201,7 +201,7 @@ public struct PlainNavbarModifier: ViewModifier {
     
     @State var viewModel: PlainNavbar.ViewModel
     
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         
         switch viewModel.state {
             
