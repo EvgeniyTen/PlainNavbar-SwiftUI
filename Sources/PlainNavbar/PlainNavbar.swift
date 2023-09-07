@@ -41,7 +41,7 @@ public extension PlainNavbar {
         
         public class BaseButtonViewModel: ObservableObject ,Identifiable {
             
-            let id: UUID = UUID()
+            public let id: UUID = UUID()
         }
         
         public class CloseButtonViewModel: BaseButtonViewModel {
@@ -49,7 +49,7 @@ public extension PlainNavbar {
             @Published var icon: Image = Image(systemName: "xmark")
             @Published var action: () -> Void
             
-            init(action: @escaping () -> Void) {
+            public init(action: @escaping () -> Void) {
                 self.action = action
                 super.init()
             }
@@ -60,7 +60,7 @@ public extension PlainNavbar {
             @Published var text: String
             @Published var action: () -> Void
             
-            init(text: String, action: @escaping () -> Void) {
+            public init(text: String, action: @escaping () -> Void) {
                 self.text = text
                 self.action = action
                 super.init()
@@ -69,7 +69,7 @@ public extension PlainNavbar {
         
         public class LargeTitleLabel: BaseButtonViewModel {
             @Published var text: String
-            init(text: String) {
+            public init(text: String) {
                 self.text = text
             }
         }
@@ -79,7 +79,7 @@ public extension PlainNavbar {
             @Published var text: String
             @Published var action: () -> Void
             
-            init(action: @escaping () -> Void) {
+            public init(action: @escaping () -> Void) {
 
                 self.text = "Back"
                 self.action = action
@@ -89,7 +89,7 @@ public extension PlainNavbar {
     }
 }
 @available(iOS 15.0, *)
-public struct PlainNavbar: View {
+struct PlainNavbar: View {
 
     @ObservedObject var viewModel: ViewModel
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
@@ -123,9 +123,6 @@ public struct PlainNavbar: View {
                             EmptyView()
                         }
                     }
-                    ForEach(0..<leftPlaceholdersCount, id: \.self) { _ in
-                        Spacer().frame(width: 20, height: 20)
-                    }
                 }
                 
                 Spacer()
@@ -147,9 +144,7 @@ public struct PlainNavbar: View {
                 
                 HStack(alignment: .top, spacing: 18) {
                     
-                    ForEach(0..<rightPlaceholdersCount, id: \.self) { _ in
-                        Spacer().frame(width: 20, height: 20)
-                    }
+                    
                     ForEach(viewModel.rightButtons) { button in
                         
                         switch button {
