@@ -14,7 +14,7 @@ extension PlainNavbar {
         @Published var state: State
         
         
-        internal init(title: Title,
+        public init(title: Title,
                       leftButtons: [BaseButtonViewModel] = [],
                       rightButtons: [BaseButtonViewModel] = [],
                       textColor: Color,
@@ -213,7 +213,7 @@ struct PlainNavbar: View {
 }
 
 @available(iOS 15.0, *)
-struct PlainNavbarModifier: ViewModifier {
+public struct PlainNavbarModifier: ViewModifier {
     
     @State var viewModel: PlainNavbar.ViewModel
     
@@ -248,9 +248,9 @@ struct PlainNavbarModifier: ViewModifier {
 }
 
 @available(iOS 15.0, *)
-extension View {
+public extension View {
     
-    func navigationBar(with viewModel: PlainNavbar.ViewModel) -> some View {
+    public func navigationBar(with viewModel: PlainNavbar.ViewModel) -> some View {
         
         self.modifier(PlainNavbarModifier(viewModel: viewModel))
     }
