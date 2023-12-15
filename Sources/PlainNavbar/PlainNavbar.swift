@@ -71,14 +71,6 @@ struct NavigationBarViewModifier<C: View>: ViewModifier {
     func body(content: Content) -> some View {
         
         VStack(spacing: 0) {
-            
-            if #available(iOS 16.0, *) {
-                content
-                    .toolbar(.hidden, for: .navigationBar)
-            } else {
-                content
-                    .navigationBarHidden(true)
-            }
             Extract(barItems) { views in
                 NavigationBarContent(
                     foregroundStyle: foregroundStyle,
@@ -88,6 +80,15 @@ struct NavigationBarViewModifier<C: View>: ViewModifier {
                     topRight: filtered(views, .trailing)
                 )
             }
+            
+            if #available(iOS 16.0, *) {
+                content
+                    .toolbar(.hidden, for: .navigationBar)
+            } else {
+                content
+                    .navigationBarHidden(true)
+            }
+           
         }
     }
     
