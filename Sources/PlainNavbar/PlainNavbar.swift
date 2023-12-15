@@ -1,301 +1,155 @@
 import SwiftUI
-import Foundation
 
+public enum BarItemAlignment: String {
+    case leading = "leading"
+    case trailing = "trailing"
+    case center = "center"
+}
 @available(iOS 15.0, *)
-public extension PlainNavbar {
+public enum BarForegroundType {
+    case colored(Color)
+    case none
+}
+@available(iOS 15.0, *)
+struct NavigationBarContent: View {
+    let foregroundStyle: BarForegroundType
+    let barHeight: CGFloat
     
-    @available(iOS 15.0, *)
-    public class ViewModel: ObservableObject {
-        
-        @Published var title: Title
-        @Published var leftButtons: [BaseButtonViewModel]
-        @Published var rightButtons: [BaseButtonViewModel]
-        @Published var textColor: Color
-        @Published var state: State
-        
-        
-        public init(title: Title,
-                      leftButtons: [BaseButtonViewModel] = [],
-                      rightButtons: [BaseButtonViewModel] = [],
-                      textColor: Color,
-                      state: State = .normal
-        ) {
+    let topLeft: [AnyView]
+    let topCenter: [AnyView]
+    let topRight: [AnyView]
+    
+    var body: some View {
+        HStack {
+            HStack(spacing: 20) {
+                ForEach(topLeft.indices, id: \.self) { index in
+                    topLeft[index]
+                }
+            }
             
-            self.title = title
-            self.leftButtons = leftButtons
-            self.rightButtons = rightButtons
-            self.textColor = textColor
-            self.state = state
-        }
-        
-        public enum State {
-            case normal
-            case hidden
-        }
-        
-        public enum Title {
+            Spacer()
             
-            case text(String)
-            case empty
-        }
-        
-        public class BaseButtonViewModel: ObservableObject ,Identifiable {
-            
-            public let id: UUID = UUID()
-        }
-        
-        public class CloseButtonViewModel: BaseButtonViewModel {
-            
-            @Published var icon: Image = Image(systemName: "xmark")
-            @Published var action: () -> Void
-            
-            public init(action: @escaping () -> Void) {
-                self.action = action
-                super.init()
+            HStack(spacing: 20) {
+                ForEach(topCenter.indices, id: \.self) { index in
+                    topCenter[index]
+                }
+            }
+            Spacer()
+            HStack(spacing: 20) {
+                ForEach(topRight.indices, id: \.self) { index in
+                    topRight[index]
+                }
             }
         }
-        
-        public class TextButtonViewModel: BaseButtonViewModel {
-            
-            @Published var text: String
-            @Published var action: () -> Void
-            
-            public init(text: String, action: @escaping () -> Void) {
-                self.text = text
-                self.action = action
-                super.init()
-            }
-        }
-        
-        public class LargeTitleLabel: BaseButtonViewModel {
-            @Published var text: String
-            public init(text: String) {
-                self.text = text
-            }
-        }
-        
-        public class BackButtonViewModel: BaseButtonViewModel {
-            
-            @Published var text: String
-            @Published var action: () -> Void
-            
-            public init(action: @escaping () -> Void) {
-
-                self.text = "Back"
-                self.action = action
-                super.init()
-            }
-        }
+        .padding(.horizontal, 12)
+        .frame(height: barHeight)
+        .background(
+            backgroundColor
+        )
     }
 }
 @available(iOS 15.0, *)
-public struct PlainNavbar: View {
-
-    @ObservedObject var viewModel: ViewModel
-    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-    
-    public var body: some View {
-        
-        switch viewModel.state {
-            
-        case .normal:
-            HStack(alignment: .center, spacing: 0) {
-                
-                HStack(alignment: .top, spacing: 18) {
-                    
-                    ForEach(viewModel.leftButtons) { button in
-                        
-                        switch button {
-                        case let backButtonViewModel as PlainNavbar.ViewModel.BackButtonViewModel:
-                            Button {
-                                mode.wrappedValue.dismiss()
-                                backButtonViewModel.action()
-                            } label: {
-                                Text(backButtonViewModel.text)
-                                    .foregroundColor(viewModel.textColor)
-                            }
-                            
-                        case let largeTile as PlainNavbar.ViewModel.LargeTitleLabel:
-                            Text(largeTile.text)
-                                .foregroundColor(viewModel.textColor)
-                                .font(.largeTitle)
-                        default:
-                            EmptyView()
-                        }
-                    }
-                }
-                
-                Spacer()
-                
-                switch viewModel.title {
-                    
-                case .text(let title):
-                    Text(title)
-                        .foregroundColor(viewModel.textColor)
-                        .font(.callout)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    
-                case .empty:
-                    EmptyView()
-                }
-                
-                Spacer()
-                
-                HStack(alignment: .top, spacing: 18) {
-                    
-                    
-                    ForEach(viewModel.rightButtons) { button in
-                        
-                        switch button {
-                            
-                        
-                        case let buttonViewModel as PlainNavbar.ViewModel.CloseButtonViewModel:
-                            Button {
-                                buttonViewModel.action()
-                                mode.wrappedValue.dismiss()
-                                
-                            } label: {
-                                buttonViewModel.icon
-                                    .renderingMode(.template)
-                                    .foregroundColor(viewModel.textColor)
-                                    .padding(5)
-                                    .background(
-                                        Circle()
-                                            .foregroundColor(.white)
-                                            .shadow(color: .gray.opacity(0.1), radius: 2)
-                                    )
-                                
-                            }
-                            
-                        case let buttonViewModel as PlainNavbar.ViewModel.TextButtonViewModel:
-                            Button {
-                                buttonViewModel.action()
-                            } label: {
-                                Text(buttonViewModel.text)
-                                    .foregroundColor(viewModel.textColor)
-                                    .font(.callout)
-                            }
-                            
-                        default:
-                            EmptyView()
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 14)
-            .frame(height: 50)
-            .background(
-                .ultraThinMaterial
-            )
-            
-        case .hidden:
-            EmptyView()
+extension NavigationBarContent {
+    @ViewBuilder var backgroundColor: some View {
+        switch foregroundStyle {
+        case .none:
+            Color.clear
+                .ignoresSafeArea(edges: .top)
+        case .colored(let color):
+            color
+                .ignoresSafeArea(edges: .top)
         }
     }
-
 }
 
 @available(iOS 15.0, *)
-public struct PlainNavbarModifier: ViewModifier {
+struct NavigationBarViewModifier<C: View>: ViewModifier {
+    let foregroundStyle: BarForegroundType
+    let barHeight: CGFloat
+    @ViewBuilder let barItems: C
     
-    @State var viewModel: PlainNavbar.ViewModel
-    
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         
-        switch viewModel.state {
+        VStack(spacing: 0) {
             
-        case .normal:
-            
-            ZStack(alignment: .top) {
-                
-                
+            if #available(iOS 16.0, *) {
                 content
-                    .navigationBarHidden(true)
-                
-                PlainNavbar(viewModel: viewModel)
-                
-                
-               
-                
-            }
-            
-        case .hidden:
-            
-            VStack {
-                PlainNavbar(viewModel: viewModel)
+                    .toolbar(.hidden, for: .navigationBar)
+            } else {
                 content
                     .navigationBarHidden(true)
             }
+            Extract(barItems) { views in
+                NavigationBarContent(
+                    foregroundStyle: foregroundStyle,
+                    barHeight: barHeight,
+                    topLeft: filtered(views, .leading),
+                    topCenter: filtered(views, .center),
+                    topRight: filtered(views, .trailing)
+                )
+            }
         }
     }
+    
+    private func filtered(_ views: Views, _ side: BarItemAlignment) -> [AnyView] {
+        var viewsArray = [AnyView]()
+        views.forEach { view in
+            if let id = view.id as? String,
+               id.contains(side.rawValue) {
+                viewsArray.append(AnyView(view))
+            }
+        }
+        return viewsArray
+    }
 }
-
 @available(iOS 15.0, *)
 public extension View {
-    
-    public func navigationBar(with viewModel: PlainNavbar.ViewModel) -> some View {
         
-        self.modifier(PlainNavbarModifier(viewModel: viewModel))
-    }
-}
-
-@available(iOS 15.0, *)
-public extension PlainNavbar.ViewModel {
-    
-    
-    public static let sample = PlainNavbar.ViewModel(title: .text("Main"),
-                                                     leftButtons: [PlainNavbar.ViewModel.LargeTitleLabel(text: "hello")],
-                                                     rightButtons: [PlainNavbar.ViewModel.CloseButtonViewModel(action: {}),
-                                                                    PlainNavbar.ViewModel.TextButtonViewModel(text: "Forgot?", action: {})], textColor: .black)
-    
-    public static let onlyBackButton = PlainNavbar.ViewModel(title: .empty,
-                                                     leftButtons: [PlainNavbar.ViewModel.BackButtonViewModel(action: {})],
-                                                      textColor: .black)
-    
-    public static let onlyCloseButton = PlainNavbar.ViewModel(title: .empty,
-                                                       rightButtons: [PlainNavbar.ViewModel.CloseButtonViewModel(action: {})],
-                                                      textColor: .black)
-
-    
-}
-
-
-@available(iOS 15.0, *)
-struct PlainNavbar_Previews: PreviewProvider {
-    
-    static var previews: some View {
-
-        Group {
-            ScrollView {
-                VStack(spacing: 10) {
-                    Color.blue
-                        .frame(height: 180)
-                    Color.red
-                        .frame(height: 180)
-                }
-            }
-            .navigationBar(with: .sample)
-            
-            ScrollView {
-                VStack(spacing: 10) {
-                    Color.blue
-                        .frame(height: 180)
-                    Color.red
-                        .frame(height: 180)
-                }
-            }
-            .navigationBar(with: .onlyBackButton)
-            
-            ScrollView {
-                VStack(spacing: 10) {
-                    Color.blue
-                        .frame(height: 180)
-                    Color.red
-                        .frame(height: 180)
-                }
-            }
-            .navigationBar(with: .onlyCloseButton)
+    /// In this example, we have a custom view instead of a disabled navigation bar.
+    /// This toolbar is very easy to use: it is enough to transfer the content
+    /// to this method, which is simple swift UIview object, as in the code example below:
+    ///
+    ///      var toolbar: some View {
+    ///        Group {
+    ///           leadingBarItem
+    ///           trailingBarItem
+    ///         }
+    ///     }
+    ///
+    ///     Adding required properties to a toolbar object
+    /// You must specify its belonging to the side where it should be located,
+    /// when creating a Bar Item object, as an example (see the last line)
+    ///
+    ///     private var leadingBarItem: some View {
+    ///         Image(systemName: "heart.fill")
+    ///             .renderingMode(.template)
+    ///             .onTapGesture {
+    ///                 // some action
+    ///             }
+    ///             .toolbarSide(.leading)
+    ///     }
+    ///
+    ///     Add the toolbar object to the modifier method and get the magic
+    /// The previously created toolbar must be passed to the current modifier method
+    /// as an incoming parameter, as in the example below:
+    ///
+    ///     .navigationBar {
+    ///         toolbar
+    ///             .renderingMode(.template)
+    ///             .onTapGesture {
+    ///                 // some action
+    ///             }
+    ///             .toolbarSide(.leading)
+    ///     }
+    ///
+    func navigationBar<C: View>(
+        foregroundStyle: BarForegroundType = .none,
+        barHeight: CGFloat = 50,
+        @ViewBuilder content: () -> C) -> some View {
+            self.modifier(NavigationBarViewModifier(foregroundStyle: foregroundStyle, barHeight: barHeight, barItems: content))
         }
+    
+    func toolbarSide(_ alignmemt: BarItemAlignment) -> some View {
+        self.id(UUID().uuidString + alignmemt.rawValue)
     }
 }
